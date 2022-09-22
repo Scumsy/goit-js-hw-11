@@ -32,15 +32,12 @@ searchForm.addEventListener('submit', e => {
   });
 });
 
-loadMoreBtn.addEventListener(
-  'click',
-  (e = async () => {
-    pageNumber += 1;
-    const response = await getSearchRequest(inputForSearch, pageNumber);
-
-    return renderImageList(response);
-  })
-);
+loadMoreBtn.addEventListener('click', e => {
+  pageNumber += 1;
+  getSearchRequest(inputForSearch, pageNumber).then(images =>
+    renderImageList(images)
+  );
+});
 
 function makeGalleryMarkup(url, tag, likes, views, comments, downloads) {
   const markup = `<div class="photo-card">
