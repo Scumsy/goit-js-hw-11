@@ -5,7 +5,7 @@ import { getSearchRequest } from './getImages';
 import Notiflix from 'notiflix';
 import axios from 'axios';
 
-let images = [];
+// let images = [];
 let inputForSearch = '';
 let pageNumber = 1;
 const gallery = document.querySelector('.gallery');
@@ -20,6 +20,7 @@ searchForm.addEventListener('submit', e => {
   e.preventDefault();
 
   getSearchRequest(inputForSearch, pageNumber).then(images => {
+    // console.log(images);
     if (images.length === 0) {
       Notiflix.Notify.warning(
         'Sorry, there are no images matching your search query. Please try again.'
