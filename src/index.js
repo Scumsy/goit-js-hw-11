@@ -20,7 +20,6 @@ searchForm.addEventListener('submit', e => {
   e.preventDefault();
 
   getSearchRequest(inputForSearch, pageNumber).then(images => {
-    console.log(images);
     if (images.length === 0) {
       Notiflix.Notify.warning(
         'Sorry, there are no images matching your search query. Please try again.'
