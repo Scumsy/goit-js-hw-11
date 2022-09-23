@@ -1,11 +1,7 @@
 import './css/styles.css';
 import { getSearchRequest } from './getImages';
-
-// import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
-import axios from 'axios';
 
-// let images = [];
 let inputForSearch = '';
 let pageNumber = 1;
 const gallery = document.querySelector('.gallery');
@@ -18,25 +14,32 @@ searchForm.addEventListener('input', e => {
 
 searchForm.addEventListener('submit', e => {
   e.preventDefault();
-
-  getSearchRequest(inputForSearch, pageNumber).then(images => {
-    // console.log(images);
-    if (images.length === 0) {
-      Notiflix.Notify.warning(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else {
-      gallery.innerHTML = '';
-      renderImageList(images);
-    }
-  });
+  try {
+    getSearchRequest(inputForSearch, pageNumber).then(images => {
+      // console.log(images);
+      if (images.length === 0) {
+        Notiflix.Notify.warning(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else {
+        gallery.innerHTML = '';
+        renderImageList(images);
+      }
+    });
+  } catch {
+    Notiflix.Notify.failure("We're sorry, something went wrong.");
+  }
 });
 
 loadMoreBtn.addEventListener('click', e => {
   pageNumber += 1;
-  getSearchRequest(inputForSearch, pageNumber).then(images =>
-    renderImageList(images)
-  );
+  try {
+    getSearchRequest(inputForSearch, pageNumber).then(images => {
+      renderImageList(images);
+    });
+  } catch {
+    Notiflix.Notify.failure("We're sorry, something went wrong.");
+  }
 });
 
 function makeGalleryMarkup(url, tag, likes, views, comments, downloads) {
@@ -65,17 +68,25 @@ function makeGalleryMarkup(url, tag, likes, views, comments, downloads) {
 }
 
 function renderImageList(images) {
-  for (let i = 0; i < images.length; i += 1) {
-    const imageList = makeGalleryMarkup(
-      images[i].webformatURL,
-      images[i].tags,
-      images[i].likes,
-      images[i].views,
-      images[i].comments,
-      images[i].downloads
+  const renderImages = images.hits.map(image => {
+    let { webformatURL, tags, likes, views, comments, downloads } = image;
+    return makeGalleryMarkup(
+      webformatURL,
+      tags,
+      likes,
+      views,
+      comments,
+      downloads
     );
-
-    gallery.insertAdjacentHTML('beforeend', imageList);
+  });
+  gallery.insertAdjacentHTML('beforeend', renderImages);
+  const maxPage = Math.ceil(images.totalHits / 40);
+  if (maxPage === pageNumber) {
+    loadMoreBtn.classList.add('is-hidden');
+    Notiflix.Notify.failure(
+      "We're sorry, but you've reached the end of search results."
+    );
+  } else {
     loadMoreBtn.classList.remove('is-hidden');
   }
 }
